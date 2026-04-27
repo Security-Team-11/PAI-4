@@ -1,0 +1,36 @@
+name: DevSecOps Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  security-pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Install dependencies
+      run: sudo apt-get update
+
+    - name: SCA - Dependency Check
+      run: |
+        chmod +x scripts/dependency_check.sh
+        ./scripts/dependency_check.sh
+
+    - name: SAST - Semgrep
+      run: |
+        pip install semgrep
+        semgrep --config=auto . > tests/sast_results.txt
+
+    - name: DAST - OWASP ZAP
+      run: |
+        chmod +x scripts/zap_scan.sh
+        ./scripts/zap_scan.sh
+
+    - name: IaC - Trivy
+      run: |
+        chmod +x scripts/trivy_scan.sh
+        ./scripts/trivy_scan.sh
