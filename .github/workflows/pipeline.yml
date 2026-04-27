@@ -2,8 +2,7 @@ name: DevSecOps Pipeline
 
 on:
   push:
-    branches: [ "main", "master" ]
-
+    branches: [ "main", "master", "Juan" ] 
 jobs:
   security-scans:
     runs-on: ubuntu-latest
