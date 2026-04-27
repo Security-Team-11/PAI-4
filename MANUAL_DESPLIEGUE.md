@@ -36,14 +36,14 @@ docker compose logs initializer
 ```
 
 Accesos:
-- `http://localhost:8000`
-- `http://localhost:8000/api/key-v2`
+- `http://localhost:8080`
+- `http://localhost:8080/api/key-v2`
 
 ### 2.4 Ejecutar Pruebas y Enviar Reportes
 
 ```bash
 bash tests/run-security-tests.sh http://localhost:8080
-bash integracion_defectdojo.sh http://localhost:8000 <API_KEY> 1
+bash integracion_defectdojo.sh http://localhost:8080 <API_KEY> 1
 ```
 
 ## 3. Pipeline CI/CD
@@ -67,6 +67,6 @@ docker compose ps
 ### Error de conexion a DefectDojo
 
 ```bash
-curl -v http://localhost:8000
-curl -H "Authorization: Token <API_KEY>" http://localhost:8000/api/v2/users/
+curl -v http://localhost:8080
+curl -H "Authorization: Token <API_KEY>" http://localhost:8080/api/v2/users/
 ```

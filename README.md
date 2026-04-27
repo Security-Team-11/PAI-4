@@ -28,7 +28,7 @@ http://localhost:8080
 bash tests/run-security-tests.sh
 
 # Enviar reportes a una instancia externa de DefectDojo
-bash integracion_defectdojo.sh http://localhost:8000 <API_KEY>
+bash integracion_defectdojo.sh http://localhost:8080 <API_KEY>
 ```
 
 ### DefectDojo Externo
@@ -45,14 +45,14 @@ docker compose logs initializer
 Despues:
 
 ```text
-http://localhost:8000
-http://localhost:8000/api/key-v2
+http://localhost:8080
+http://localhost:8080/api/key-v2
 ```
 
 Luego usa el token en este proyecto:
 
 ```bash
-bash integracion_defectdojo.sh http://localhost:8000 <API_KEY> 1
+bash integracion_defectdojo.sh http://localhost:8080 <API_KEY> 1
 ```
 
 ### GitHub Actions
