@@ -1,6 +1,46 @@
 
-
 #Ignore vscode AI rules
 .github\instructions\codacy.instructions.md
 
 .logs/
+
+# Reportes de seguridad (temporales, se generan en pipeline)
+reports/
+*.json
+*.sarif
+report_json.json
+reporte-trivy.json
+semgrep.sarif
+
+# Logs locales
+logs/
+*.log
+
+# IDE y sistema
+.vscode/
+.DS_Store
+*.swp
+*.swo
+*~
+.env
+.env.local
+
+# Docker
+.docker/
+
+# Node modules (si se agrega)
+node_modules/
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Archivos temporales
+tmp/
+temp/
+*.tmp
+
+# PDFs generados (se crean en pipeline)
+*.pdf

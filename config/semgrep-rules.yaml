@@ -1,0 +1,36 @@
+# Configuración Semgrep - SAST
+# Reglas para detectar vulnerabilidades en código PHP
+
+rules:
+  - id: sql-injection-vulnerable
+    pattern-either:
+      - pattern: $VAR . "'"
+      - pattern: mysqli_query(...)
+    message: "Posible SQL Injection detectada"
+    languages: [php]
+    severity: ERROR
+
+  - id: xss-vulnerability
+    pattern-either:
+      - pattern: "echo $..."
+      - pattern: print $...
+    message: "Posible XSS - variable sin sanitización"
+    languages: [php]
+    severity: ERROR
+
+  - id: hardcoded-password
+    pattern-either:
+      - pattern: '$password = "..."'
+      - pattern: 'PASSWORD = "..."'
+    message: "Contraseña hardcodeada detectada"
+    languages: [php]
+    severity: CRITICAL
+
+  - id: missing-authentication
+    pattern: |
+      if (isset($_GET[$X])) {
+        ...
+      }
+    message: "Falta validación de autenticación"
+    languages: [php]
+    severity: HIGH

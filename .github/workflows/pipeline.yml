@@ -2,35 +2,34 @@ name: DevSecOps Pipeline
 
 on:
   push:
-    branches: [ "main"] 
+    branches: ["main"]
+
 jobs:
   security-scans:
     runs-on: ubuntu-latest
     steps:
-      - name: 1. Checkout del código
+      - name: 1. Checkout del codigo
         uses: actions/checkout@v4
 
-      # --- SAST (Semgrep) ---
-      - name: 2. Análisis SAST con Semgrep
+      - name: 2. Analisis SAST con Semgrep
         uses: returntocorp/semgrep-action@v1
         with:
           generateSarif: "1"
 
       - name: Guardar reporte SAST
-        if: always() # Guarda el reporte aunque la prueba falle
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: reporte-semgrep
           path: semgrep.sarif
 
-      # --- SCA e IaC (Trivy) ---
-      - name: 3. Análisis SCA e IaC con Trivy
+      - name: 3. Analisis SCA e IaC con Trivy
         uses: aquasecurity/trivy-action@master
         with:
-          scan-type: 'fs'
-          format: 'json'
-          output: 'reporte-trivy.json'
-          severity: 'CRITICAL,HIGH'
+          scan-type: "fs"
+          format: "json"
+          output: "reporte-trivy.json"
+          severity: "CRITICAL,HIGH"
 
       - name: Guardar reporte Trivy
         if: always()
@@ -39,12 +38,11 @@ jobs:
           name: reporte-trivy
           path: reporte-trivy.json
 
-      # --- DAST (OWASP ZAP) ---
-      - name: 4. Análisis DAST con OWASP ZAP
+      - name: 4. Analisis DAST con OWASP ZAP
         uses: zaproxy/action-baseline@v0.12.0
         with:
-          target: http://testphp.vulnweb.com/ # Pon aquí la URL de tu app o una de prueba
-          format: 'json'
+          target: http://testphp.vulnweb.com/
+          format: "json"
 
       - name: Guardar reporte DAST
         if: always()
@@ -52,3 +50,59 @@ jobs:
         with:
           name: reporte-zap
           path: report_json.json
+
+      - name: 5. Preparar reportes para DefectDojo
+        if: always()
+        run: |
+          echo "Reportes generados:"
+          ls -la *.json *.sarif 2>/dev/null || echo "Algunos reportes no se generaron"
+
+      - name: 6. Integracion con DefectDojo
+        if: always()
+        env:
+          DEFECTDOJO_URL: ${{ secrets.DEFECTDOJO_URL }}
+          DEFECTDOJO_API_KEY: ${{ secrets.DEFECTDOJO_API_KEY }}
+          PRODUCT_ID: "1"
+        run: |
+          if [ -z "$DEFECTDOJO_URL" ] || [ -z "$DEFECTDOJO_API_KEY" ]; then
+            echo "Secrets de DefectDojo no configurados; se omite el envio."
+            exit 0
+          fi
+
+          echo "Enviando reportes a DefectDojo..."
+
+          send_report() {
+            local scan_type="$1"
+            local file="$2"
+            if [ -f "$file" ]; then
+              echo "Enviando $scan_type desde $file..."
+              curl -X POST "$DEFECTDOJO_URL/api/v2/import-scan/" \
+                -H "Authorization: Token $DEFECTDOJO_API_KEY" \
+                -F "scan_type=$scan_type" \
+                -F "file=@$file" \
+                -F "product=$PRODUCT_ID" \
+                -F "engagement_name=CI-CD-Pipeline-$(date +%Y%m%d)" \
+                -F "active=true" \
+                --max-time 30 || echo "Error enviando $scan_type"
+            else
+              echo "Archivo no encontrado: $file"
+            fi
+          }
+
+          send_report "Semgrep JSON Report" "semgrep.sarif"
+          send_report "Trivy JSON" "reporte-trivy.json"
+          send_report "ZAP Scan" "report_json.json"
+
+          echo "Integracion DefectDojo completada"
+
+      - name: 7. Resumen de ejecucion
+        if: always()
+        run: |
+          echo "=========================================="
+          echo "Pipeline DevSecOps completado"
+          echo "=========================================="
+          echo "Analisis SAST (Semgrep)"
+          echo "Analisis SCA/IaC (Trivy)"
+          echo "Analisis DAST (OWASP ZAP)"
+          echo "Integracion DefectDojo"
+          echo "=========================================="

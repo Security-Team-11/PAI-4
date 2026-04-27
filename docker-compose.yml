@@ -1,0 +1,20 @@
+services:
+  # Aplicacion PHP vulnerable para DAST testing
+  vulnerable-app:
+    image: php:8.2-apache
+    container_name: pai4-vulnerable-app
+    volumes:
+      - ./src:/var/www/html
+    ports:
+      - "8080:80"
+    environment:
+      - PHP_DISPLAY_ERRORS=1
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+# DefectDojo no se levanta desde este repositorio.
+# Debe ejecutarse desde el repositorio oficial clonado de GitHub:
+# https://github.com/DefectDojo/django-DefectDojo
