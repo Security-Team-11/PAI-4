@@ -24,7 +24,7 @@ docker-compose logs -f vulnerable-app
 ```
 
 Servicio local:
-- `vulnerable-app`: `http://localhost:8080`
+- `vulnerable-app`: `http://localhost:8081`
 
 ### 2.3 Levantar DefectDojo desde GitHub
 
