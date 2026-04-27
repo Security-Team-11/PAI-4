@@ -10,6 +10,7 @@ El proyecto implementa un pipeline DevSecOps con Semgrep, Trivy, OWASP ZAP y Def
 - DefectDojo se clona desde GitHub y se levanta aparte con `docker compose up -d`
 - La integracion se realiza mediante API v2 con token
 
+
 ## Flujo de uso
 
 1. Levantar la app vulnerable desde este repo
